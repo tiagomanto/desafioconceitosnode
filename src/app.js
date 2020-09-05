@@ -34,7 +34,15 @@ app.use(logRequests);
 app.use('/repositories/:id', validateProjectId) //valida somente nas rotas :id
 
 app.get("/repositories", (request, response) => {
-  return response.json(repositories);
+
+  const {title} = request.query;
+  //verifica se há dados no filtro, se foi preencido ele retorna os dados senão retorna todos os projects
+  const results = title 
+    ? repositories.filter(project => project.title.includes(title))
+    : repositories; 
+
+
+  return response.json(results);
 });
 
 app.post("/repositories", (request, response) => {
@@ -56,7 +64,7 @@ app.put("/repositories/:id", (request, response) => {
   const { title, url, techs} = request.body;
 
   const findRepositoryIndex = repositories.findIndex(repositorio =>
-    repositorio === id
+    repositorio.id === id
   );  
     //quando não existir
   if (findRepositoryIndex===-1){
@@ -79,7 +87,7 @@ return response.json(repositorio);
 app.delete("/repositories/:id", (request, response) => {
   const {id} = request.params;
   const findRepositoryIndex = repositories.findIndex(repositorio =>
-    repositorio === id
+    repositorio.id === id
 );
   if (findRepositoryIndex >=0){
     repositories.splice(findRepositoryIndex,1)
